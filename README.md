@@ -1,40 +1,48 @@
-LiteContact · Mini CRM Web
+# LiteContact · Mini CRM Web
 
-LiteContact es una aplicación web ligera para la gestión de contactos registrados desde un sitio público, con panel de administración integrado. Pensado como un mini CRM autogestionable, ofrece funcionalidades como alarmas de seguimiento, administración de contenidos, protección anti-bots, y optimización para distintos entornos (dev/prod).
+**LiteContact** es una aplicación web ligera para la gestión de contactos registrados desde un sitio público, con panel de administración. Pensado como un mini CRM autogestionable, ofrece funcionalidades como alarmas de seguimiento, administración de contenidos, protección anti-bots y configuración adaptable por entorno (`dev` o `prod`).
 
-🧰 Tecnologías utilizadas
+---
 
-PHP 7.4+ (conexión PDO, librerías estándar)
+## Tecnologías utilizadas
 
-MySQL o MariaDB
+- **PHP 7.4+** (PDO, librerías estándar)
+- **MySQL/MariaDB**
+- **HTML/CSS/JS** (sin frameworks pesados)
+- **Flatpickr y Bootstrap** (aplicados en panel admin)
 
-HTML/CSS/JS (vanilla, sin frameworks pesados)
+---
 
-Uso parcial de Flatpickr y Bootstrap en el panel admin
+## Estructura del proyecto
 
-🗂️ Estructura del proyecto
-├── index.php                  # Página pública con formulario de registro
+```
+.
+├── index.php               # Página pública con formulario de registro
 ├── includes/
-│   ├── config.php             # Carga de entorno, DB, correo, logs
-│   ├── db.php                 # Conexión PDO reutilizable
-│   ├── mail.php               # Envío SMTP
-│   └── save_contact.php       # Registro de contactos con protección antispam
+│   ├── config.php          # Carga de entorno, DB, correo, logs
+│   ├── db.php              # Conexión PDO reutilizable
+│   ├── mail.php            # Envío de correos SMTP
+│   └── save_contact.php    # Registro con validaciones e idempotencia
 ├── admin/
-│   ├── _init.php              # Bootstrap de administración
-│   ├── contacts.php           # Gestión de contactos
-│   ├── view.php               # Vista individual y programación de contacto
-│   ├── examples.php           # Gestión de secciones dinámicas públicas
-│   └── banner.php             # Gestión de frases/banner dinámico
+│   ├── _init.php           # Bootstrap de administración (auth + DB setup)
+│   ├── contacts.php        # Gestión de contactos
+│   ├── view.php            # Detalle de contacto + próxima fecha
+│   ├── examples.php        # CRUD de ejemplos públicos
+│   └── banner.php          # Gestión de frases dinámicas
 ├── assets/
-│   ├── css/                   # Estilos personalizados
-│   └── js/                    # Scripts públicos y admin
-└── logs/
-    └── system.log             # Registro de eventos y errores
+│   ├── css/                # Estilos personalizados
+│   └── js/                 # Scripts para público y admin
+├── logs/
+│   └── system.log          # Registro de eventos y errores
+```
 
-⚙️ Configuración por entorno (.env)
+---
 
-Crea un archivo .env en la raíz del proyecto:
+## Configuración del entorno (`.env`)
 
+Crea un archivo `.env` en la raíz del proyecto:
+
+```env
 APP_ENV=dev
 TIMEZONE=America/Santiago
 
@@ -51,88 +59,57 @@ SMTP_PORT=465
 SMTP_USER=contacto@litecontact.cl
 SMTP_PASS=secret
 SMTP_SECURE=ssl
+```
 
+- `APP_ENV` define el entorno (`dev` o `prod`).
+- Las variables son leídas automáticamente desde `includes/config.php`.
 
-APP_ENV define si el entorno es dev o prod, y condiciona errores/logs.
+---
 
-TIMEZONE define zona horaria (por defecto: Santiago).
+## Instalación local
 
-Variables se cargan desde includes/config.php.
+1. Clona el repositorio o descarga el código.
+2. Crea la base de datos `litecontact` en tu entorno local.
+3. Configura el archivo `.env` con tus credenciales.
+4. Accede a `/admin/login.php`. El sistema generará automáticamente las tablas necesarias.
+5. Prueba el formulario público y verifica el envío de correos.
 
-🚀 Instalación rápida (modo local)
+---
 
-Clona o copia el proyecto en tu entorno local (Apache/Nginx).
+## Funcionalidades clave
 
-Crea la base de datos litecontact y configura el .env.
+- **Formulario público con validaciones** y protección anti-bots
+- **Gestión de contactos** con historial y programación de próximos seguimientos
+- **Alarmas configurables** para seguimiento pendiente
+- **Modo oscuro opcional** con persistencia en navegador
+- **CRUD dinámico** para frases del banner e “ejemplos” públicos
+- **Envío de correos** mediante plantillas con placeholders (`{{name}}`, `{{email}}`, etc.)
+- **Logs rotativos** y registro de eventos
+- **Prevención de duplicados** por fingerprint diario
 
-Accede a /admin/login.php para iniciar setup (creación automática de tablas).
+---
 
-Probar el formulario público y verificar el correo de prueba.
+## Seguridad
 
-Ajusta los contenidos desde el panel de administración.
+- Honeypot invisible contra bots
+- Rate limiting: 5 registros por IP cada 10 minutos
+- Patrón PRG para evitar doble envío
+- Errores visibles en `dev`, ocultos y logueados en `prod`
 
-📩 Emails y plantillas
+---
 
-El envío de correos se realiza vía SMTP.
+## Próximas mejoras (roadmap)
 
-En entorno dev, los errores se muestran en consola o logs.
+- Resumen diario de contactos pendientes por email
+- Plantillas de mensajes reutilizables (WhatsApp/Email)
+- Exportar eventos a Google Calendar/ICS/Outlook
+- Gestión de roles (admin, operador) y auditoría de acciones
+- Webhooks: integraciones con Zapier o servicios externos
+- Optimización automática de imágenes subidas (resize + WebP)
+- Configuración avanzada desde panel admin
 
-Se utilizan placeholders como {{name}}, {{email}} para los textos de los correos.
+---
 
-🔐 Seguridad y protección
+## Licencia
 
-Idempotencia para evitar duplicados: detección por fingerprint diario.
-
-Honeypot invisible para bloquear bots.
-
-Rate Limiting: 5 intentos cada 10 minutos por IP.
-
-PRG pattern: evita doble envío con botón deshabilitado al enviar.
-
-📊 Logs automáticos
-
-Se guarda todo en logs/system.log con rotación automática:
-
-Máximo 5MB por archivo.
-
-Archivos antiguos renombrados por fecha y purgados tras 30 días.
-
-✨ Funcionalidades destacadas
-
-Gestión de “Próximo contacto” con fechas programables por registro.
-
-CRUD para ejemplos e imágenes del sitio público.
-
-Modo oscuro disponible (respeta prefers-color-scheme y se guarda en localStorage).
-
-Soporte para emojis en contenidos y etiquetas accesibles.
-
-Diseño responsive con mejoras de usabilidad móvil.
-
-🧭 Roadmap (en desarrollo)
-
-Recordatorios diarios por email a administradores.
-
-Plantillas de seguimiento por WhatsApp/correo con variables dinámicas.
-
-Exportación de eventos a calendarios (Google/ICS).
-
-Perfiles y roles diferenciados (admin/operador).
-
-Bitácora de acciones (auditoría).
-
-Envío de eventos por webhooks (Zapier, etc).
-
-Optimización automática de imágenes (resize/WebP).
-
-📌 Notas
-
-Proyecto en desarrollo continuo.
-
-En dev se muestran los errores PHP, en prod se registran en log.
-
-El sistema está pensado para implementaciones simples y autogestionables.
-
-📄 Licencia
-
-Uso interno y privado de LiteContact. No redistribuir sin autorización.
+Uso privado y exclusivo para desarrolladores autorizados. No redistribuir sin permiso.
