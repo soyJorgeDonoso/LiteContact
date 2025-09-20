@@ -1,0 +1,57 @@
+# Prompt base — Proyecto "Tu Plan Seguro"
+
+Debes trabajar en el proyecto **Tu Plan Seguro**, construido en **PHP + MySQL**, con frontend en **HTML5, CSS3, JS nativo y Bootstrap 5**.  
+
+⚠️ **Muy importante**:  
+- Siempre aplica las reglas del proyecto (estructura, estilo, librerías permitidas, buenas prácticas).  
+- Entrega el **archivo completo**, no fragmentos.  
+- Puedes modificar **base de datos, backend y frontend** en una misma tarea.  
+- **No pidas confirmación**: ejecuta directamente las instrucciones, salvo que la solicitud sea ambigua.  
+- El resultado debe ser **seguro, responsivo y sin errores PHP**.  
+
+---
+
+## Reglas clave a respetar
+1. **DB**:  
+   - Tablas mínimas: `contact_status`, `contact_history`, `reminder_settings`.  
+   - `contact_status` debe almacenar datos completos del contacto + estado + fecha límite.  
+   - `contact_history` guarda cada cambio de estado con nota.  
+   - `reminder_settings` define plazos de alarmas (3 días, 1 día, 2 horas).  
+
+2. **Backend (PHP + PDO)**:  
+   - Prepared statements siempre.  
+   - Validar y sanitizar inputs.  
+   - Guardar logs de errores, no mostrarlos en producción.  
+   - Manejo de sesiones para administración.  
+
+3. **Frontend (HTML + Bootstrap 5)**:  
+   - Interfaz moderna y responsiva.  
+   - Bootstrap para tablas, formularios, modales, badges, paginación.  
+   - FontAwesome para íconos.  
+   - SweetAlert2 para confirmaciones y notificaciones.  
+   - flatpickr/Tempus Dominus para seleccionar fecha/hora en `deadline_at`.  
+   - Timeline para historial de gestión (`contact_history`).  
+
+4. **Gestión de contactos**:  
+   - Estados admitidos: Nuevo, En proceso, Pospuesto, Pendiente de respuesta, Contactado, Convertido, No interesado, Datos inválidos, Duplicado, Archivado.  
+   - Cada cambio de estado requiere nota → guardar en `contact_history`.  
+   - Alarmas automáticas (3d, 1d, 2h) antes del deadline, configurables en `reminder_settings`.  
+   - Alarmas visibles en UI:  
+     - Rojo = vencido.  
+     - Amarillo = próximas.  
+   - Campana 🔔 en header con contador de alertas.  
+
+5. **Buenas prácticas**:  
+   - Código limpio, legible e indentado.  
+   - Imágenes con `loading="lazy"`.  
+   - Sin CLS (layout shifts) en Lighthouse.  
+   - Accesible (`aria-*`, `role`, labels correctos).  
+
+---
+
+## Resultado esperado
+- Código entregado **listo para usar en producción**.  
+- Archivos completos (PHP, HTML, CSS, JS) según lo que se solicite.  
+- Cambios en DB reflejados con `ALTER TABLE` o `CREATE TABLE`.  
+- Interfaz moderna, responsiva y funcional.  
+- Sin errores ni notices de PHP.  
