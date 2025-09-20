@@ -2,6 +2,29 @@
 // Ajusta estas constantes a tu entorno local/producción
 // Ejemplo local (XAMPP/WAMP): user root sin password, DB tuplanseguro
 // Logging unificado (rotación por tamaño y limpieza por edad)
+// Carga de variables de entorno desde archivo .env (si existe)
+if (!function_exists('load_dotenv')) {
+  function load_dotenv(string $path): void {
+    if (!is_file($path)) return;
+    try {
+      $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+      if (!$lines) return;
+      foreach ($lines as $line) {
+        if (!$line || $line[0]==='#') continue;
+        $pos = strpos($line, '='); if ($pos===false) continue;
+        $key = trim(substr($line, 0, $pos));
+        $val = trim(substr($line, $pos+1));
+        if ($val !== '' && ($val[0]==="'" || $val[0]=='"')) { $val = trim($val, "'\""); }
+        if ($key !== '') {
+          @putenv($key.'='.$val);
+          $_ENV[$key] = $val;
+          $_SERVER[$key] = $val;
+        }
+      }
+    } catch (Throwable $e) { /* noop */ }
+  }
+}
+load_dotenv(__DIR__ . '/../.env');
 if (!function_exists('app_log')) {
   function app_log(string $message): void {
     $logDir = __DIR__ . '/../logs';
@@ -53,17 +76,15 @@ if (!defined('APP_ENV')) {
   define('APP_ENV', $envFromServer ? strtolower($envFromServer) : 'dev');
 }
 
-if (APP_ENV === 'prod') {
-  if (!defined('DB_HOST')) define('DB_HOST', 'localhost');
-  if (!defined('DB_NAME')) define('DB_NAME', 'dbdc5w1pvpolqn');
-  if (!defined('DB_USER')) define('DB_USER', 'uk0siof1510tr');
-  if (!defined('DB_PASS')) define('DB_PASS', 'panxo2025_*');
-} else {
-  if (!defined('DB_HOST')) define('DB_HOST', '127.0.0.1');
-  if (!defined('DB_NAME')) define('DB_NAME', 'tuplanseguro');
-  if (!defined('DB_USER')) define('DB_USER', 'root');
-  if (!defined('DB_PASS')) define('DB_PASS', 'root123456'); // password local
-}
+// DB config: tomar primero de variables de entorno, si no, usar defaults según APP_ENV
+$envDbHost = getenv('DB_HOST');
+$envDbName = getenv('DB_NAME');
+$envDbUser = getenv('DB_USER');
+$envDbPass = getenv('DB_PASS');
+if (!defined('DB_HOST')) define('DB_HOST', $envDbHost ?: (APP_ENV==='prod' ? 'localhost' : '127.0.0.1'));
+if (!defined('DB_NAME')) define('DB_NAME', $envDbName ?: (APP_ENV==='prod' ? 'dbdc5w1pvpolqn' : 'tuplanseguro'));
+if (!defined('DB_USER')) define('DB_USER', $envDbUser ?: (APP_ENV==='prod' ? 'uk0siof1510tr' : 'root'));
+if (!defined('DB_PASS')) define('DB_PASS', $envDbPass ?: (APP_ENV==='prod' ? 'panxo2025_*' : 'root123456'));
 
 // App/env
 // APP_ENV ya fijado arriba
@@ -86,15 +107,14 @@ if (!defined('BASE_URL')) {
   define('BASE_URL', $scheme . '://' . $host . $basePath);
 }
 
-// Mail (SMTP producción)
-if (!defined('MAIL_DRIVER')) define('MAIL_DRIVER', 'smtp'); // log | mail | smtp
-if (!defined('MAIL_FROM')) define('MAIL_FROM', 'contacto@tuplanseguro.cl');
-if (!defined('MAIL_FROM_NAME')) define('MAIL_FROM_NAME', 'Tu Plan Seguro');
-// SMTP credenciales reales
-if (!defined('SMTP_HOST')) define('SMTP_HOST', 'mail.tuplanseguro.cl');
-if (!defined('SMTP_PORT')) define('SMTP_PORT', 465); // SSL 465
-if (!defined('SMTP_USER')) define('SMTP_USER', 'contacto@tuplanseguro.cl');
-if (!defined('SMTP_PASS')) define('SMTP_PASS', 'panxo2025_*');
-if (!defined('SMTP_SECURE')) define('SMTP_SECURE', 'ssl'); // Puerto 465 requiere SSL
+// Mail (SMTP) - tomar de entorno si existe, si no usar defaults actuales
+if (!defined('MAIL_DRIVER')) define('MAIL_DRIVER', getenv('MAIL_DRIVER') ?: 'smtp'); // log | mail | smtp
+if (!defined('MAIL_FROM')) define('MAIL_FROM', getenv('MAIL_FROM') ?: 'contacto@tuplanseguro.cl');
+if (!defined('MAIL_FROM_NAME')) define('MAIL_FROM_NAME', getenv('MAIL_FROM_NAME') ?: 'Tu Plan Seguro');
+if (!defined('SMTP_HOST')) define('SMTP_HOST', getenv('SMTP_HOST') ?: 'mail.tuplanseguro.cl');
+if (!defined('SMTP_PORT')) define('SMTP_PORT', (int)(getenv('SMTP_PORT') ?: 465)); // SSL 465
+if (!defined('SMTP_USER')) define('SMTP_USER', getenv('SMTP_USER') ?: 'contacto@tuplanseguro.cl');
+if (!defined('SMTP_PASS')) define('SMTP_PASS', getenv('SMTP_PASS') ?: 'panxo2025_*');
+if (!defined('SMTP_SECURE')) define('SMTP_SECURE', getenv('SMTP_SECURE') ?: 'ssl'); // Puerto 465 requiere SSL
 
 

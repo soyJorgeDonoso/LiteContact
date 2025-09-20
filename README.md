@@ -25,13 +25,28 @@ Proyecto PHP para gestión de contactos y contenidos públicos, con panel de adm
   - `js/main.js` y `js/admin.js`: interacciones públicas/admin
 - `logs/`: `system.log` (rotación automática)
 
-## Configuración de entorno
-- La variable de entorno `APP_ENV` determina el entorno: `dev` o `prod` (por defecto `prod`).
-- `includes/config.php` define las credenciales y ajustes según `APP_ENV`:
-  - DB (dev): host `127.0.0.1`, base `tuplanseguro`, user `root`, pass `root123456`
-  - DB (prod): credenciales provistas por hosting
-  - SMTP: host `mail.tuplanseguro.cl`, puerto 465 (SSL). En `dev` se relaja verificación TLS solo para pruebas locales
-- Timezone global: `America/Santiago`
+## Configuración de entorno (.env)
+- Crea un archivo `.env` en la raíz (no se versiona) basado en:
+```
+APP_ENV=dev
+TIMEZONE=America/Santiago
+
+DB_HOST=127.0.0.1
+DB_NAME=tuplanseguro
+DB_USER=root
+DB_PASS=secret
+
+MAIL_DRIVER=smtp
+MAIL_FROM=contacto@tuplanseguro.cl
+MAIL_FROM_NAME=Tu Plan Seguro
+SMTP_HOST=mail.tuplanseguro.cl
+SMTP_PORT=465
+SMTP_USER=contacto@tuplanseguro.cl
+SMTP_PASS=secret
+SMTP_SECURE=ssl
+```
+- `includes/config.php` carga `.env` si existe y usa esas variables priorizando sobre defaults.
+- `APP_ENV` determina `dev|prod`. Zona horaria: `TIMEZONE` (por defecto America/Santiago).
 
 Cómo definir `APP_ENV`:
 - Windows (PowerShell): `setx APP_ENV dev` (reiniciar Apache/PHP si aplica)
